@@ -1,0 +1,6 @@
+coverage
+desktop-uploader-*.tgz
+Gulpfile.coffee
+example/.desktop-uploader-example.json
+src
+tests
