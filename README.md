@@ -112,7 +112,7 @@ uploader.throttle(false);
 ```
 
 ## Advanced Example
-You can find an advanced, real-world example that uploads files to S3 in [examples/example.litcoffee](/danielgtaylor/node-desktop-uploader/blob/master/example/example.litcoffee).
+You can find an advanced, real-world example that uploads files to S3 in [examples/example.litcoffee](https://github.com/danielgtaylor/node-desktop-uploader/blob/master/example/example.litcoffee).
 
 # API Reference
 The `DesktopUploader` class is an `EventEmitter` and has the following events, properties, and methods, as well as those [inherited from EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).
