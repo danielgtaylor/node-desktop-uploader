@@ -29,7 +29,7 @@ chokidar.watch = (path, opts) ->
 # Create a mock filesystem
 mockFs
   '/.desktop-uploader-test.json': '{"paths": ["/tmp2"], "cache": {"/tmp2/foo": {"mtime": "2014-01-01T00:00:00.000Z"}}}'
-  '/tmp':
+  '/tmp1':
     file1: 'data1'
     file2: 'data2'
   '/tmp2': {}
@@ -60,15 +60,15 @@ describe 'Desktop Uploader', ->
     mockFs.restore()
 
   it 'Should add a watch directory', (done) ->
-    uploader.watch '/tmp'
+    uploader.watch '/tmp1'
     uploader.resume()
     uploader.watch '/tmp3'
     assert.ok watcher.add.called
-    assert.ok uploader.get('/tmp')
+    assert.ok uploader.get('/tmp1')
     assert.ok uploader.get('/tmp3')
 
-    watcher.emit 'add', '/tmp/file1'
-    watcher.emit 'add', '/tmp/file2'
+    watcher.emit 'add', '/tmp1/file1'
+    watcher.emit 'add', '/tmp1/file2'
     watcher.emit 'add', '/tmp3/file3'
 
     delay 10, ->
@@ -77,21 +77,21 @@ describe 'Desktop Uploader', ->
 
   it 'Should upload a new file', (done) ->
     entries.length = 0
-    fs.writeFileSync '/tmp/new1', 'data', 'utf-8'
-    watcher.emit 'add', '/tmp/new1'
+    fs.writeFileSync '/tmp1/new1', 'data', 'utf-8'
+    watcher.emit 'add', '/tmp1/new1'
 
     delay 10, ->
       assert.equal entries.length, 1
-      assert.equal entries[0].path, '/tmp/new1'
+      assert.equal entries[0].path, '/tmp1/new1'
       done()
 
   it 'Should upload a changed file', (done) ->
     entries.length = 0
-    watcher.emit 'change', '/tmp/new1'
+    watcher.emit 'change', '/tmp1/new1'
 
     delay 10, ->
       assert.equal entries.length, 1
-      assert.equal entries[0].path, '/tmp/new1'
+      assert.equal entries[0].path, '/tmp1/new1'
       done()
 
   it 'Should not upload changes after unwatch', (done) ->
@@ -106,11 +106,11 @@ describe 'Desktop Uploader', ->
       done()
 
   it 'Should ignore unchanged file', ->
-    assert.ok watcher.ignored '/tmp/file1'
+    assert.ok watcher.ignored '/tmp1/file1'
 
   it 'Should handle a removed file', (done) ->
     entries.length = 0
-    watcher.emit 'remove', '/tmp/new2'
+    watcher.emit 'remove', '/tmp1/new2'
 
     delay 10, ->
       assert.equal entries.length, 0
@@ -122,7 +122,7 @@ describe 'Desktop Uploader', ->
 
     uploader.resume()
 
-    assert.ok uploader.get '/tmp'
+    assert.ok uploader.get '/tmp1'
     assert.ok watcher.add.called
 
   it 'Should change concurrency', ->
@@ -135,7 +135,7 @@ describe 'Desktop Uploader', ->
     entries.length = 0
     uploader.throttle 5
 
-    watcher.emit 'change', '/tmp/file1'
+    watcher.emit 'change', '/tmp1/file1'
 
     delay 10, ->
       uploader.throttle off
@@ -152,7 +152,7 @@ describe 'Desktop Uploader', ->
     entries.length = 0
     uploader.removeAllListeners 'upload'
 
-    watcher.emit 'change', '/tmp/file1'
+    watcher.emit 'change', '/tmp1/file1'
 
     delay 10, ->
       done()
