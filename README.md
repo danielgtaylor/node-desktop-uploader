@@ -1,4 +1,8 @@
 # Desktop Uploader
+
+[![Dependency Status](http://img.shields.io/david/danielgtaylor/node-desktop-uploader.svg?style=flat)](https://david-dm.org/danielgtaylor/node-desktop-uploader) [![Build Status](http://img.shields.io/travis/danielgtaylor/node-desktop-uploader.svg?style=flat)](https://travis-ci.org/danielgtaylor/node-desktop-uploader) [![Coverage Status](http://img.shields.io/coveralls/danielgtaylor/node-desktop-uploader.svg?style=flat)](https://coveralls.io/r/danielgtaylor/node-desktop-uploader) [![NPM version](http://img.shields.io/npm/v/node-desktop-uploader.svg?style=flat)](https://www.npmjs.org/package/node-desktop-uploader) [![License](http://img.shields.io/npm/l/node-desktop-uploader.svg?style=flat)](http://dgt.mit-license.org/)
+
+
 The `desktop-uploader` module lets you easily write a desktop uploader for a remote service such as Dropbox, S3, Google Storage, or your own company. You define directories to watch and a function that uploads a file entry, and `desktop-uploader` handles the rest!
 
 #### Features
