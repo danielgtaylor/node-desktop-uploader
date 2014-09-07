@@ -185,7 +185,7 @@ class DesktopUploader extends EventEmitter
       root = null
       for path of paths
         index = filename.indexOf path
-        if index isnt -1 and filename[index + path.length] is '/'
+        if index isnt -1 and filename[index + path.length] in ['/', '\\']
           root = path
           break
 
