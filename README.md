@@ -211,6 +211,28 @@ uploader.on('upload', function (entry, done) {
 });
 ```
 
+#### Event: `unwatch`
+Emitted when a folder is unwatched.
+
+```javascript
+uploader.on('unwatch', function (paths) {
+  console.log('Unwatching:\n' + path.join('\n'));
+});
+
+uploader.unwatch('/some/path');
+```
+
+#### Event: `watch`
+Emitted when a folder is watched.
+
+```javascript
+uploader.on('watch', function (path, config) {
+  console.log('Watching ' + path);
+});
+
+uploader.watch('/some/path', {my: 'config'});
+```
+
 ### Properties
 
 #### Property: `modifyInterval = 5000`

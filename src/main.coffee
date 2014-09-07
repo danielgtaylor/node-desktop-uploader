@@ -52,6 +52,7 @@ class DesktopUploader extends EventEmitter
   # Add a new directory to watch. Existing files will be queued for upload.
   watch: (path, config={}) ->
     log "Watching #{path}"
+    @emit 'watch', path, config
     paths[fs.realpathSync path] = config
     if watcher then watcher.add fs.realpathSync(path)
 
@@ -61,10 +62,12 @@ class DesktopUploader extends EventEmitter
     # list and check for this case in the `update` method below.
     if path
       log "Unwatching #{path}"
+      @emit 'unwatch', [path]
       delete paths[fs.realpathSync path]
     else
       # Clear all paths, TODO: update cache?
       log "Unwatching all paths"
+      @emit 'unwatch', Object.keys(paths)
       paths = {}
 
   # Get path custom configuration
