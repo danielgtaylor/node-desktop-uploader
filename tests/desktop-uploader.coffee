@@ -148,6 +148,14 @@ describe 'Desktop Uploader', ->
   it 'Should get all paths', ->
     assert.ok uploader.get()
 
+  it 'Should set and get custom config values', ->
+    uploader.config('mysetting', 'foo')
+
+    assert.equal uploader.config('mysetting'), 'foo'
+
+  it 'Should return undefined for missing custom config', ->
+    assert.equal uploader.config('missing'), undefined
+
   it 'Should not blow up when missing event handlers', (done) ->
     entries.length = 0
     uploader.removeAllListeners 'upload'

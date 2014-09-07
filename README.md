@@ -9,7 +9,8 @@ The `desktop-uploader` module lets you easily write a desktop uploader for a rem
 
 * Recursively watch folders and files for changes
   * Uses native events (fsevents, inotify, ReadDirectoryChangesW)
-* Store per-folder custom configuration between runs
+* Persistent custom configuration values
+* Persistent per-folder custom configuration
 * Determine when a file is no longer being modified
 * Upload files using custom business logic
 * Concurrently upload many files

@@ -15,6 +15,7 @@ class DesktopUploader extends EventEmitter
   self = null
   name = 'desktop-uploader'
   configPath = null
+  customConfig = {}
   cache = {}
   paths = {}
   watcher = null
@@ -72,6 +73,15 @@ class DesktopUploader extends EventEmitter
       paths[fs.realpathSync path]
     else
       paths
+
+  # Get or set custom config values
+  config: (name, value) ->
+    if value isnt undefined
+      customConfig[name] = value
+      saveConfig()
+      undefined
+    else
+      customConfig[name]
 
   # Start or resume uploading
   resume: ->
@@ -131,7 +141,7 @@ class DesktopUploader extends EventEmitter
 
     log "Writing cache to #{path}..."
 
-    fs.writeFileSync path, JSON.stringify {cache, paths}
+    fs.writeFileSync path, JSON.stringify {cache, paths, customConfig}
 
   loadConfig = ->
     path = ".#{name}.json"
@@ -145,6 +155,7 @@ class DesktopUploader extends EventEmitter
       
       cache = config.cache or {}
       paths = config.paths or {}
+      customConfig = config.customConfig or {}
 
   # This gets called by chokidar to see if an updated file should be ignored
   checkIgnore = (filename) ->
