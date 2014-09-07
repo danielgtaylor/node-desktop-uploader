@@ -169,3 +169,9 @@ describe 'Desktop Uploader', ->
   it 'Should resume with no paths configured', ->
     uploader.pause()
     uploader.resume()
+
+  it 'Should save config immediately', ->
+    mtime = fs.statSync('/.desktop-uploader-test.json').mtime
+    uploader.save true
+    diff = fs.statSync('/.desktop-uploader-test.json').mtime - mtime
+    assert.ok diff > 0

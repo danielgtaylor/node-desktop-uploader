@@ -294,6 +294,17 @@ Start or resume the uploader. Since the uploader is created in a paused state, y
 uploader.resume();
 ```
 
+#### Method: `save`
+Give a hint that the uploader should save its configuration to disk in the near future. If `immediate` is `true`, then save to disk right now.
+
+```javascript
+// Save in the near future, when convenient
+uploader.save();
+
+// Useful to call on app exit
+uploader.save(true);
+```
+
 #### Method: `throttle`
 Set the bandwidth throttling limit in bytes per second. Passing in `null`, `false`, or no options will disable bandwidth throttling.
 

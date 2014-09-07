@@ -118,6 +118,13 @@ class DesktopUploader extends EventEmitter
     watcher.close()
     watcher = null
 
+  # Manually save config
+  save: (immediate) ->
+    if immediate
+      _saveConfig()
+    else
+      saveConfig()
+
   # Set concurrency limit
   concurrency: (value) ->
     queue.concurrency = value
