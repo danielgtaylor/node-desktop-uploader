@@ -15,16 +15,14 @@ delay = (ms, func) -> setTimeout func, ms
 # chokidar events on a fake filesystem.
 watcher = null
 class FakeFSWatcher extends EventEmitter
+  constructor: (opts) ->
+    watcher = this
+    @ignored = opts.ignored
   add: sinon.spy()
   close: sinon.spy()
   ignored: -> false
 
 chokidar.FSWatcher = FakeFSWatcher
-chokidar.watch = (path, opts) ->
-  watcher = new FakeFSWatcher()
-  watcher.add path
-  watcher.ignored = opts.ignored
-  return watcher
 
 # Create a mock filesystem
 mockFs
@@ -168,11 +166,6 @@ describe 'Desktop Uploader', ->
   it 'Should remove all paths', ->
     uploader.unwatch()
 
-  it 'Should fail to resume with no paths configured', ->
+  it 'Should resume with no paths configured', ->
     uploader.pause()
-    try
-      uploader.resume()
-    catch err
-      false
-
-    assert.ok err
+    uploader.resume()

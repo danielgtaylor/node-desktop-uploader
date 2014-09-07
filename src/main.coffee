@@ -85,16 +85,14 @@ class DesktopUploader extends EventEmitter
 
   # Start or resume uploading
   resume: ->
-    self.emit 'resume'
-
-    pathnames = Object.keys(paths)
-    if not pathnames.length
-      throw new Error('Resume called with zero watch paths!')
-    
     # If not already running
     if not watcher
+      self.emit 'resume'
+
+      pathnames = Object.keys(paths)
+
       log "Creating watcher with #{pathnames[0]}..."
-      watcher = chokidar.watch pathnames[0],
+      watcher = new chokidar.FSWatcher
         usePolling: false
         persistent: true
         ignored: checkIgnore
@@ -106,7 +104,7 @@ class DesktopUploader extends EventEmitter
         delete cache[filename]
         saveConfig()
 
-      for path in pathnames[1...]
+      for path in pathnames
         log "Adding #{path}"
         watcher.add path
 
