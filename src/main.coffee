@@ -169,9 +169,11 @@ class DesktopUploader extends EventEmitter
 
   # This gets called by chokidar to see if an updated file should be ignored
   checkIgnore = (filename) ->
-    # Is this extension ignored?
-    if extensions and filename.split('.').pop().toLowerCase() not in extensions
-      return true
+    # Is this extension ignored? Only ignore files, not directories.
+    if extensions and fs.statSync(filename).isFile()
+      if filename.split('.').pop().toLowerCase() not in extensions
+        log "Ignoring #{filename}"
+        return true
 
     unless cache[filename] then return false
 

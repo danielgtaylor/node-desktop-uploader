@@ -108,14 +108,19 @@ describe 'Desktop Uploader', ->
     assert.ok watcher.ignored '/tmp1/file1.txt'
 
   it 'Should ignore extension capitalization', ->
-    fs.writeFileSync '/tmp1/capitalized.TxT'
+    fs.writeFileSync '/tmp1/capitalized.TxT', 'data', 'utf-8'
     assert.equal watcher.ignored('/tmp1/capitalized.TxT'), false
 
   it 'Should ignore unwanted extensions', ->
+    fs.writeFileSync '/tmp1/ignored.pdf', 'data', 'utf-8'
     assert.ok watcher.ignored '/tmp1/ignored.pdf'
 
   it 'Should ignore missing extension', ->
+    fs.writeFileSync '/tmp1/missing', 'data', 'utf-8'
     assert.ok watcher.ignored '/tmp1/missing'
+
+  it 'Should not ignore directories', ->
+    assert.equal watcher.ignored('/tmp1'), false
 
   it 'Should handle a removed file', (done) ->
     entries.length = 0
