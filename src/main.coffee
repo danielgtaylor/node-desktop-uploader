@@ -21,6 +21,7 @@ class DesktopUploader extends EventEmitter
   watcher = null
   queue = null
   throttleGroup = null
+  extensions = null
 
   saveConfig = null
 
@@ -32,6 +33,7 @@ class DesktopUploader extends EventEmitter
     if options.name then name = options.name
     if options.configPath then configPath = options.configPath
     if options.throttle then self.throttle options.throttle
+    if options.extensions then extensions = options.extensions
     
     self.modifyInterval = options.modifyInterval or 5000
 
@@ -167,6 +169,10 @@ class DesktopUploader extends EventEmitter
 
   # This gets called by chokidar to see if an updated file should be ignored
   checkIgnore = (filename) ->
+    # Is this extension ignored?
+    if extensions and filename.split('.').pop().toLowerCase() not in extensions
+      return true
+
     unless cache[filename] then return false
 
     stat = fs.statSync filename

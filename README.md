@@ -9,6 +9,7 @@ The `desktop-uploader` module lets you easily write a desktop uploader for a rem
 
 * Recursively watch folders and files for changes
   * Uses native events (fsevents, inotify, ReadDirectoryChangesW)
+* Whitelist file extensions you care about
 * Persistent custom configuration values
 * Persistent per-folder custom configuration
 * Determine when a file is no longer being modified
@@ -16,7 +17,7 @@ The `desktop-uploader` module lets you easily write a desktop uploader for a rem
 * Concurrently upload many files
 * Keep a cache of info on already-uploaded files
 * Throttle aggregate uploads to a set bandwidth (e.g. 100Kbytes/sec)
-* Works with [atom-shell](https://github.com/atom/atom-shell) and [node-webkit](https://github.com/rogerwang/node-webkit) for a user cross-platform interface
+* Works with [atom-shell](https://github.com/atom/atom-shell) and [node-webkit](https://github.com/rogerwang/node-webkit) for a cross-platform user interface
 
 #### Improvement Ideas
 
@@ -247,17 +248,21 @@ Parameter      | Description                          | Default
 -------------- | ------------------------------------ | -------
 concurrency    | Number of concurrent uploads         | `2`
 configPath     | Directory to store configuration     | `null`
+extensions     | File extensions to watch             | `null`
 modifyInterval | Duration in ms to check file writes  | `5000`
 name           | Unique name used for configuration   | `'desktop-uploader'`
 paths          | List of paths to watch               | `[]`
 saveInterval   | Duration in ms to save configuration | `10000`
 throttle       | Limit bandwidth in bytes per second  | `null`
 
+Note: extensions are not case-sensitive. You should always supply them in lowercase.
+
 ```javascript
 var uploader = new DesktopUploader({
   name: 'my-cool-uploader',
   configPath: process.env.HOME,
   paths: ['/some/path', '/another/path'],
+  extensions: ['jpg', 'png'],
   throttle: 250 * 1024
 });
 ```

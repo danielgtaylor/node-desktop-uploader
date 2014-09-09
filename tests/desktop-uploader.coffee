@@ -28,11 +28,11 @@ chokidar.FSWatcher = FakeFSWatcher
 mockFs
   '/.desktop-uploader-test.json': '{"paths": ["/tmp2"], "cache": {"/tmp2/foo": {"mtime": "2014-01-01T00:00:00.000Z"}}}'
   '/tmp1':
-    file1: 'data1'
-    file2: 'data2'
+    'file1.txt': 'data1'
+    'file2.txt': 'data2'
   '/tmp2': {}
   '/tmp3':
-    file3: 'data3'
+    'file3.txt': 'data3'
   '0': '' # <-- hack to get tests working, don't ask me why...
 
 # Let's set up some tests!
@@ -45,6 +45,7 @@ describe 'Desktop Uploader', ->
     configPath: '/'
     paths: ['/tmp2']
     throttle: 100
+    extensions: ['txt']
 
   # Uncomment for extra debug output, which may help for failing tests
   # uploader.on 'log', (message) ->
@@ -65,9 +66,9 @@ describe 'Desktop Uploader', ->
     assert.ok uploader.get('/tmp1')
     assert.ok uploader.get('/tmp3')
 
-    watcher.emit 'add', '/tmp1/file1'
-    watcher.emit 'add', '/tmp1/file2'
-    watcher.emit 'add', '/tmp3/file3'
+    watcher.emit 'add', '/tmp1/file1.txt'
+    watcher.emit 'add', '/tmp1/file2.txt'
+    watcher.emit 'add', '/tmp3/file3.txt'
 
     delay 10, ->
       assert.equal entries.length, 3
@@ -75,40 +76,50 @@ describe 'Desktop Uploader', ->
 
   it 'Should upload a new file', (done) ->
     entries.length = 0
-    fs.writeFileSync '/tmp1/new1', 'data', 'utf-8'
-    watcher.emit 'add', '/tmp1/new1'
+    fs.writeFileSync '/tmp1/new1.txt', 'data', 'utf-8'
+    watcher.emit 'add', '/tmp1/new1.txt'
 
     delay 10, ->
       assert.equal entries.length, 1
-      assert.equal entries[0].path, '/tmp1/new1'
+      assert.equal entries[0].path, '/tmp1/new1.txt'
       done()
 
   it 'Should upload a changed file', (done) ->
     entries.length = 0
-    watcher.emit 'change', '/tmp1/new1'
+    watcher.emit 'change', '/tmp1/new1.txt'
 
     delay 10, ->
       assert.equal entries.length, 1
-      assert.equal entries[0].path, '/tmp1/new1'
+      assert.equal entries[0].path, '/tmp1/new1.txt'
       done()
 
   it 'Should not upload changes after unwatch', (done) ->
     entries.length = 0
     uploader.unwatch '/tmp2'
 
-    fs.writeFileSync '/tmp2/new2'
-    watcher.emit 'add', '/tmp2/new2'
+    fs.writeFileSync '/tmp2/new2.txt'
+    watcher.emit 'add', '/tmp2/new2.txt'
 
     delay 10, ->
       assert.equal entries.length, 0
       done()
 
   it 'Should ignore unchanged file', ->
-    assert.ok watcher.ignored '/tmp1/file1'
+    assert.ok watcher.ignored '/tmp1/file1.txt'
+
+  it 'Should ignore extension capitalization', ->
+    fs.writeFileSync '/tmp1/capitalized.TxT'
+    assert.equal watcher.ignored('/tmp1/capitalized.TxT'), false
+
+  it 'Should ignore unwanted extensions', ->
+    assert.ok watcher.ignored '/tmp1/ignored.pdf'
+
+  it 'Should ignore missing extension', ->
+    assert.ok watcher.ignored '/tmp1/missing'
 
   it 'Should handle a removed file', (done) ->
     entries.length = 0
-    watcher.emit 'remove', '/tmp1/new2'
+    watcher.emit 'remove', '/tmp1/new2.txt'
 
     delay 10, ->
       assert.equal entries.length, 0
@@ -133,7 +144,7 @@ describe 'Desktop Uploader', ->
     entries.length = 0
     uploader.throttle 5
 
-    watcher.emit 'change', '/tmp1/file1'
+    watcher.emit 'change', '/tmp1/file1.txt'
 
     delay 10, ->
       uploader.throttle off
@@ -158,7 +169,7 @@ describe 'Desktop Uploader', ->
     entries.length = 0
     uploader.removeAllListeners 'upload'
 
-    watcher.emit 'change', '/tmp1/file1'
+    watcher.emit 'change', '/tmp1/file1.txt'
 
     delay 10, ->
       done()
