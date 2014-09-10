@@ -241,6 +241,14 @@ uploader.watch('/some/path', {my: 'config'});
 #### Property: `modifyInterval = 5000`
 This value determines how often in milliseconds a file is checked to see if it has been modified. If a file has not been modified between checks, then it is eligible to be uploaded and an `upload` event will be fired. Defaults to **5 seconds**.
 
+#### Property: `tasks`
+A **read-only** array of tasks in the queue. Each task has the following fields:
+
+Name | Description                | Example
+---- | -------------------------- | -------
+path | The full path to the file  | `'/home/daniel/Pictures/2014/IMG_8088.jpg'`
+root | The watched directory path | `'/home/daniel/Pictures'`
+
 ### Methods
 
 #### Method: Constructor

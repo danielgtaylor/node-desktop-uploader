@@ -131,6 +131,10 @@ describe 'Desktop Uploader', ->
       assert.equal entries.length, 0
       done()
 
+  it 'Should list task queue', ->
+    assert.ok uploader.tasks instanceof Array
+    assert.equal uploader.tasks.length, 0
+
   it 'Should pause and resume with watched paths', ->
     uploader.pause()
     assert.ok watcher.close.called

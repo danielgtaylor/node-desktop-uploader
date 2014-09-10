@@ -11,6 +11,12 @@ pathJoin = require('path').join
 delay = (ms, func) -> setTimeout func, ms
 
 class DesktopUploader extends EventEmitter
+  ### Public properties ###
+  Object.defineProperties @prototype,
+    tasks:
+      enumerable: true
+      get: -> queue.tasks
+
   ### Private properties ###
   self = null
   name = 'desktop-uploader'
