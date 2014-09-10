@@ -91,11 +91,16 @@ describe 'Desktop Uploader', ->
       assert.ok success
       processFired = true
 
+    drainFired = false
+    uploader.once 'drain', ->
+      drainFired = true
+
     delay 10, ->
       assert.equal entries.length, 1
       assert.equal entries[0].path, '/tmp1/new1.txt'
       assert.ok queueFired
       assert.ok processFired
+      assert.ok drainFired
       done()
 
   it 'Should upload a changed file', (done) ->

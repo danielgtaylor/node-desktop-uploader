@@ -58,6 +58,7 @@ class DesktopUploader extends EventEmitter
       if not paths[path] then self.watch path
 
     queue = async.queue upload, concurrency
+    queue.drain = -> self.emit 'drain'
 
   # Add a new directory to watch. Existing files will be queued for upload.
   watch: (path, config={}) ->

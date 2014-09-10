@@ -123,6 +123,15 @@ The `DesktopUploader` class is an `EventEmitter` and has the following events, p
 
 ### Events
 
+#### Event: `drain`
+Emitted when the last item in the queue has finished uploading (or failed). At this point, the queue is empty and no items are being processed.
+
+```javascript
+uploader.on('drain', function () {
+  console.log('We are finished!');
+});
+```
+
 #### Event: `error`
 Emitted when an error occurs. The second argument, if present, is the filename which was being processed when the error occured.
 
