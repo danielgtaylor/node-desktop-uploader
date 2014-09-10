@@ -159,6 +159,19 @@ uploader.on('pause', function () {
 });
 ```
 
+#### Event: `processed`
+Emitted after an entry is finished uploading (including retries) and is going to be removed from the queue. Parameters are the enty and whether the upload was successful.
+
+```javascript
+uploader.on('processed', function (entry, success) {
+  if (success) {
+    console.log(entry.path + ' successully uploaded!');
+  } else {
+    console.log(entry.path + ' failed to upload!');
+  }
+});
+```
+
 #### Event: `queue`
 Emitted when an item is added to the queue. This event is fired after the item has been added or changed on disk and after a reasonable effort has been made to ensure it is no longer being written.
 

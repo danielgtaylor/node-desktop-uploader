@@ -80,9 +80,22 @@ describe 'Desktop Uploader', ->
     fs.writeFileSync '/tmp1/new1.txt', 'data', 'utf-8'
     watcher.emit 'add', '/tmp1/new1.txt'
 
+    queueFired = false
+    uploader.once 'queue', (filename, root) ->
+      assert.equal filename, '/tmp1/new1.txt'
+      queueFired = true
+
+    processFired = false
+    uploader.once 'processed', (entry, success) ->
+      assert.equal entry.path, '/tmp1/new1.txt'
+      assert.ok success
+      processFired = true
+
     delay 10, ->
       assert.equal entries.length, 1
       assert.equal entries[0].path, '/tmp1/new1.txt'
+      assert.ok queueFired
+      assert.ok processFired
       done()
 
   it 'Should upload a changed file', (done) ->

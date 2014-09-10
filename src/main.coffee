@@ -278,7 +278,8 @@ class DesktopUploader extends EventEmitter
           # No event handler registered, finish the entry
           tryUploadDone()
 
-      async.retry tryCount, tryUpload.bind(this, entry), done
-
+      async.retry tryCount, tryUpload.bind(this, entry), (err, result) ->
+        self.emit 'processed', entry, not err
+        done()
 
 module.exports = {DesktopUploader}
