@@ -15,7 +15,7 @@ class DesktopUploader extends EventEmitter
   Object.defineProperties @prototype,
     tasks:
       enumerable: true
-      get: -> queue.tasks
+      get: -> item.data for item in queue.tasks
 
   ### Private properties ###
   self = null
