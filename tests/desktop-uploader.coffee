@@ -101,8 +101,14 @@ describe 'Desktop Uploader', ->
     fs.writeFileSync '/tmp2/new2.txt'
     watcher.emit 'add', '/tmp2/new2.txt'
 
+    ignoreFired = false
+    uploader.once 'ignore', (filename) ->
+      assert.equal filename, '/tmp2/new2.txt'
+      ignoreFired = true
+
     delay 10, ->
       assert.equal entries.length, 0
+      assert.ok ignoreFired
       done()
 
   it 'Should ignore unchanged file', ->

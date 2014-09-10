@@ -185,6 +185,7 @@ class DesktopUploader extends EventEmitter
     if extensions and fs.statSync(filename).isFile()
       if filename.split('.').pop().toLowerCase() not in extensions
         log "Ignoring #{filename}"
+        self.emit 'ignore', filename
         return true
 
     unless cache[filename] then return false
@@ -197,6 +198,7 @@ class DesktopUploader extends EventEmitter
     # TODO: check hash or something?
 
     log "Ignoring #{filename}"
+    self.emit 'ignore', filename
     true
 
   # We know a file was added or modified, and it was not ignored. Watch it
@@ -231,6 +233,7 @@ class DesktopUploader extends EventEmitter
       # Ignore the file? No longer watched?
       if root is null
         log "Skipping #{filename} which is no longer watched"
+        self.emit 'ignore', filename
         return
 
       self.emit 'queue', filename, root
@@ -244,6 +247,7 @@ class DesktopUploader extends EventEmitter
     # is called, so let's check here and not process those items
     unless paths[entry.root]
       log "Skipping #{entry.path} which is no longer watched"
+      self.emit 'ignore', filename
       return done()
 
     entry.config = paths[entry.root]

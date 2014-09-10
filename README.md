@@ -132,6 +132,15 @@ uploader.on('error', function (err, filename) {
 });
 ```
 
+#### Event: `ignore`
+Emitted when a file has been ignored (e.g. incorrect extension, no longer being watched, etc).
+
+```javascript
+uploader.on('ignore', function (filename) {
+  console.log('Ignoring ' + filename);
+});
+```
+
 #### Event: `log`
 Log a debug message from the uploader.
 
