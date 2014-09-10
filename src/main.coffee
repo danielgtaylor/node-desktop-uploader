@@ -22,6 +22,7 @@ class DesktopUploader extends EventEmitter
   queue = null
   throttleGroup = null
   extensions = null
+  tryCount = 1
 
   saveConfig = null
 
@@ -34,6 +35,7 @@ class DesktopUploader extends EventEmitter
     if options.configPath then configPath = options.configPath
     if options.throttle then self.throttle options.throttle
     if options.extensions then extensions = options.extensions
+    if options.retries then tryCount = options.retries + 1
     
     self.modifyInterval = options.modifyInterval or 5000
 
@@ -138,6 +140,10 @@ class DesktopUploader extends EventEmitter
       throttleGroup = new ThrottleGroup rate: bytes
     else
       throttleGroup = null
+
+  # Set the retry count. Use zero for no retries.
+  retry: (times) ->
+    tryCount = times + 1
 
   ### Private methods ###
   log = (message) ->
@@ -257,9 +263,12 @@ class DesktopUploader extends EventEmitter
       cache[entry.path] = {mtime: stat.mtime}
       saveConfig()
 
-      if not self.emit 'upload', entry, done
-        # No event handler registered, finish the entry
-        done()
+      tryUpload = (entry, tryUploadDone) ->
+        if not self.emit 'upload', entry, tryUploadDone
+          # No event handler registered, finish the entry
+          tryUploadDone()
+
+      async.retry tryCount, tryUpload.bind(this, entry), done
 
 
 module.exports = {DesktopUploader}

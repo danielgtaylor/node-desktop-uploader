@@ -15,6 +15,7 @@ The `desktop-uploader` module lets you easily write a desktop uploader for a rem
 * Determine when a file is no longer being modified
 * Upload files using custom business logic
 * Concurrently upload many files
+* Automatically handle retries of failures
 * Keep a cache of info on already-uploaded files
 * Throttle aggregate uploads to a set bandwidth (e.g. 100Kbytes/sec)
 * Works with [atom-shell](https://github.com/atom/atom-shell) and [node-webkit](https://github.com/rogerwang/node-webkit) for a cross-platform user interface
@@ -32,7 +33,7 @@ $ npm install --save desktop-uploader
 
 ## Basic Example
 
-Create a new desktop uploader instance. It takes an optional options object where you can set initial paths to watch and a few options, like the number of concurrent uploads. **Note**: the uploader is created in a paused state.
+Create a new desktop uploader instance. It takes an optional options object where you can set initial paths to watch and a few options, like the number of concurrent uploads and how many times to retry failures. **Note**: the uploader is created in a paused state.
 
 ```javascript
 var DesktopUploader = require('desktop-uploader').DesktopUploader;
@@ -41,7 +42,8 @@ var request = require('request');
 var uploader = new DesktopUploader({
   name: 'my-cool-app',
   paths: ['/home/daniel/Pictures'],
-  concurrency: 3
+  concurrency: 3,
+  retry: 2
 });
 ```
 
@@ -252,6 +254,7 @@ extensions     | File extensions to watch             | `null`
 modifyInterval | Duration in ms to check file writes  | `5000`
 name           | Unique name used for configuration   | `'desktop-uploader'`
 paths          | List of paths to watch               | `[]`
+retries        | Number of retries for failures       | `0`
 saveInterval   | Duration in ms to save configuration | `10000`
 throttle       | Limit bandwidth in bytes per second  | `null`
 
@@ -263,7 +266,8 @@ var uploader = new DesktopUploader({
   configPath: process.env.HOME,
   paths: ['/some/path', '/another/path'],
   extensions: ['jpg', 'png'],
-  throttle: 250 * 1024
+  throttle: 250 * 1024,
+  retries: 1
 });
 ```
 
@@ -297,6 +301,17 @@ Start or resume the uploader. Since the uploader is created in a paused state, y
 
 ```javascript
 uploader.resume();
+```
+
+#### Method `retry`
+Set the automatic retry count. Anytime the `done` function is called with an error during the `upload` event handler it is considered for a retry. The `upload` event will be emitted again up to the number of retries. Set to zero to disable retry logic.
+
+```javascript
+# Retry up to two times (total of three upload requests)
+uploader.retry(2);
+
+# Disable retries
+uploader.retry(0);
 ```
 
 #### Method: `save`

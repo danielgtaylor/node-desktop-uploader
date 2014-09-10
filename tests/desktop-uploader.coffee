@@ -46,6 +46,7 @@ describe 'Desktop Uploader', ->
     paths: ['/tmp2']
     throttle: 100
     extensions: ['txt']
+    retries: 1
 
   # Uncomment for extra debug output, which may help for failing tests
   # uploader.on 'log', (message) ->
@@ -177,6 +178,22 @@ describe 'Desktop Uploader', ->
     watcher.emit 'change', '/tmp1/file1.txt'
 
     delay 10, ->
+      done()
+
+  it 'Should retry failures', (done) ->
+    uploadSpy = sinon.spy (entry, done) ->
+      done new Error 'Something went wrong!'
+
+    uploader.retry 2
+    uploader.removeAllListeners 'upload'
+    uploader.on 'upload', uploadSpy
+    uploader.on 'error', -> false
+
+    watcher.emit 'change', '/tmp1/file1.txt'
+
+    delay 10, ->
+      assert.equal uploadSpy.callCount, 3
+      uploader.removeAllListeners 'error'
       done()
 
   it 'Should remove all paths', ->
