@@ -59,6 +59,12 @@ describe 'Desktop Uploader', ->
   after ->
     mockFs.restore()
 
+  it 'Should instantiate multiple times and not require arguments', ->
+    new DesktopUploader()
+
+    # No assertions here, but all the other tests will fail if
+    # anything is screwy after creating a second uploader instance.
+
   it 'Should add a watch directory', (done) ->
     uploader.watch '/tmp1'
     uploader.resume()
