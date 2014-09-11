@@ -271,8 +271,26 @@ uploader.watch('/some/path', {my: 'config'});
 
 ### Properties
 
+#### Property: `concurrency`
+This value determines the number of concurrent uploads. If throttling is enabled, then all uploads are throttled to the aggregate bandwidth limit. Setting a concurrency limit of `1` means only one upload at a time.
+
+```javascript
+uploader.concurrency = 5;
+```
+
 #### Property: `modifyInterval = 5000`
 This value determines how often in milliseconds a file is checked to see if it has been modified. If a file has not been modified between checks, then it is eligible to be uploaded and an `upload` event will be fired. Defaults to **5 seconds**.
+
+#### Property `retries`
+This value determines the automatic retry count. Anytime the `done` function is called with an error during the `upload` event handler it is considered for a retry. The `upload` event will be emitted again up to the number of retries. Set to zero to disable retry logic.
+
+```javascript
+# Retry up to two times (total of three upload requests)
+uploader.retries = 2;
+
+# Disable retries
+uploader.retries = 1;
+```
 
 #### Property: `tasks`
 A **read-only** array of tasks in the queue. Each task has the following fields:
@@ -281,6 +299,17 @@ Name | Description                | Example
 ---- | -------------------------- | -------
 path | The full path to the file  | `'/home/daniel/Pictures/2014/IMG_8088.jpg'`
 root | The watched directory path | `'/home/daniel/Pictures'`
+
+#### Property: `throttle`
+This value determines the bandwidth throttling limit in bytes per second. Setting to `null`, `false`, or no options will disable bandwidth throttling.
+
+```javascript
+// Throttle to 10 Kbytes per second
+uploader.throttle = 10240;
+
+// Disable throttling
+uploader.throttle = false;
+```
 
 ### Methods
 
@@ -310,13 +339,6 @@ var uploader = new DesktopUploader({
   throttle: 250 * 1024,
   retries: 1
 });
-```
-
-#### Method: `concurrency`
-Set the number of concurrent uploads. If throttling is enabled, then all uploads are throttled to the aggregate bandwidth limit. Setting a concurrency limit of `1` means only one upload at a time.
-
-```javascript
-uploader.concurrency(5);
 ```
 
 #### Method: `get`
@@ -351,17 +373,6 @@ Start or resume the uploader and watcher. Since the uploader and watcher are cre
 uploader.resume();
 ```
 
-#### Method `retry`
-Set the automatic retry count. Anytime the `done` function is called with an error during the `upload` event handler it is considered for a retry. The `upload` event will be emitted again up to the number of retries. Set to zero to disable retry logic.
-
-```javascript
-# Retry up to two times (total of three upload requests)
-uploader.retry(2);
-
-# Disable retries
-uploader.retry(0);
-```
-
 #### Method: `save`
 Give a hint that the uploader should save its configuration to disk in the near future. If `immediate` is `true`, then save to disk right now.
 
@@ -371,17 +382,6 @@ uploader.save();
 
 // Useful to call on app exit
 uploader.save(true);
-```
-
-#### Method: `throttle`
-Set the bandwidth throttling limit in bytes per second. Passing in `null`, `false`, or no options will disable bandwidth throttling.
-
-```javascript
-// Throttle to 10 Kbytes per second
-uploader.throttle(10240);
-
-// Disable throttling
-uploader.throttle();
 ```
 
 #### Method: `unwatch`

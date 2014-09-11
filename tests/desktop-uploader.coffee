@@ -200,19 +200,23 @@ describe 'Desktop Uploader', ->
       done()
 
   it 'Should change concurrency', ->
-    uploader.concurrency 5
-    uploader.concurrency 2
+    uploader.concurrency = 5
+    assert.equal uploader.concurrency, 5
+
+    uploader.concurrency = 2
+    assert.equal uploader.concurrency, 2
 
     # TODO: Actually assert the number of items processed in parallel
 
   it 'Should throttle requests', (done) ->
     entries.length = 0
-    uploader.throttle 5
+    uploader.throttle = 5
 
     watcher.emit 'change', '/tmp1/file1.txt'
 
     delay 10, ->
-      uploader.throttle off
+      assert.equal uploader.throttle, 5
+      uploader.throttle = off
 
       # TODO: Actually assert speed of reads
 
@@ -243,7 +247,7 @@ describe 'Desktop Uploader', ->
     uploadSpy = sinon.spy (entry, done) ->
       done new Error 'Something went wrong!'
 
-    uploader.retry 2
+    uploader.retries = 2
     uploader.removeAllListeners 'upload'
     uploader.on 'upload', uploadSpy
     uploader.on 'error', -> false
@@ -251,6 +255,7 @@ describe 'Desktop Uploader', ->
     watcher.emit 'change', '/tmp1/file1.txt'
 
     delay 10, ->
+      assert.equal uploader.retries, 2
       assert.equal uploadSpy.callCount, 3
       uploader.removeAllListeners 'error'
       done()

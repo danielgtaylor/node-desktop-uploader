@@ -33,9 +33,34 @@ DesktopUploader = (options={}) ->
   class InnerDesktopUploader extends EventEmitter
     ### Public properties ###
     Object.defineProperties @prototype,
+      # Concurrent upload limit
+      concurrency:
+        enumerable: true
+        get: -> queue.concurrency
+        set: (value) -> queue.concurrency = value
+
+      # Set the retry count. Use zero for no retries.
+      retries:
+        enumerable: true
+        get: -> tryCount - 1
+        set: (value) ->
+          tryCount = value + 1
+
+      # Queue task entries
       tasks:
         enumerable: true
         get: -> item.data for item in queue.tasks
+
+      # Set bandwidth throttling in bytes per second
+      throttle:
+        enumerable: true
+        get: -> throttleGroup?.rate or 0
+        set: (bytes) ->
+          if bytes
+            log "Throttling to #{(bytes / 1024).toFixed(1)} kbytes/sec"
+            throttleGroup = new ThrottleGroup rate: bytes
+          else
+            throttleGroup = null
 
     ### Public methods ###
     constructor: ->
@@ -44,7 +69,7 @@ DesktopUploader = (options={}) ->
 
       if options.name then name = options.name
       if options.configPath then configPath = options.configPath
-      if options.throttle then self.throttle options.throttle
+      if options.throttle then self.throttle = options.throttle
       if options.extensions then extensions = options.extensions
       if options.retries then tryCount = options.retries + 1
       
@@ -149,22 +174,6 @@ DesktopUploader = (options={}) ->
         _saveConfig()
       else
         saveConfig()
-
-    # Set concurrency limit
-    concurrency: (value) ->
-      queue.concurrency = value
-
-    # Set bandwidth throttling in bytes per second
-    throttle: (bytes) ->
-      if bytes
-        log "Throttling to #{(bytes / 1024).toFixed(1)} kbytes/sec"
-        throttleGroup = new ThrottleGroup rate: bytes
-      else
-        throttleGroup = null
-
-    # Set the retry count. Use zero for no retries.
-    retry: (times) ->
-      tryCount = times + 1
 
     ### Private methods ###
     log = (message) ->

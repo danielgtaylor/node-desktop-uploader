@@ -15,7 +15,7 @@ gulp.task 'compile', ->
 gulp.task 'watch', ->
   gulp.watch 'src/**/*.coffee', ['compile']
 
-gulp.task 'test', ['compile'], (done) ->
+gulp.task 'test', ['compile'], ->
   gulp.src 'lib/**/*.js'
     .pipe istanbul()
     .on 'finish', ->
