@@ -33,7 +33,7 @@ class DesktopUploader extends EventEmitter
   saveConfig = null
 
   ### Public methods ###
-  constructor: (options) ->
+  constructor: (options={}) ->
     self = this
     concurrency = options.concurrency or 2
 
