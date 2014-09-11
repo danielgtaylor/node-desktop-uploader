@@ -1,6 +1,6 @@
 {
   "name": "desktop-uploader",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Recursively watch directories and upload files",
   "main": "lib/main.js",
   "scripts": {
