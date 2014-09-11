@@ -159,14 +159,39 @@ describe 'Desktop Uploader', ->
     assert.ok uploader.tasks instanceof Array
     assert.equal uploader.tasks.length, 0
 
-  it 'Should pause and resume with watched paths', ->
-    uploader.pause()
+  it 'Should pause and resume watcher with watched paths', ->
+    pauseWatcherCalled = false
+    uploader.once 'pause', (type) ->
+      if type is 'watcher'
+        pauseWatcherCalled = true
+
+    uploader.pauseWatcher()
+
+    assert.ok pauseWatcherCalled
     assert.ok watcher.close.called
 
     uploader.resume()
 
     assert.ok uploader.get '/tmp1'
     assert.ok watcher.add.called
+
+  it 'Should pause processing tasks', (done) ->
+    entries.length = 0
+
+    pauseQueueFired = false
+    uploader.once 'pause', (type) ->
+      if type is 'queue'
+        pauseQueueFired = true
+
+    uploader.pause()
+    watcher.emit 'change', '/tmp1/new1.txt'
+
+    delay 10, ->
+      assert.ok pauseQueueFired
+      assert.equal entries.length, 0
+      assert.equal uploader.tasks.length, 1
+      uploader.resume()
+      done()
 
   it 'Should change concurrency', ->
     uploader.concurrency 5

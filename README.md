@@ -160,11 +160,11 @@ uploader.on('log', function (message) {
 ```
 
 #### Event: `pause`
-Emitted when the uploader has been paused.
+Emitted when the uploader has been paused. The `type` argument will be either `'queue'` or `'watcher'` depending on which was paused.
 
 ```javascript
-uploader.on('pause', function () {
-  console.log('Uploader has been paused!');
+uploader.on('pause', function (type) {
+  console.log('Uploader ' + type + ' has been paused!');
 });
 ```
 
@@ -329,14 +329,21 @@ console.log(paths['/some/path'].foo); // Prints out 3
 ```
 
 #### Method: `pause`
-Stop the uploader. Existing in-flight items will complete, but no new items will be processed until `resume` has been called.
+Temporarily stop the uploader from firing `upload` events. Existing in-flight items will complete, but no new items will be processed until `resume` has been called.
 
 ```javascript
 uploader.pause();
 ```
 
+#### Method: `pauseWatcher`
+Temporarily ignore all file system events. No new or changed items will be added to the queue until `resume` has been called.
+
+```javascript
+uploader.pauseWatcher();
+```
+
 #### Method: `resume`
-Start or resume the uploader. Since the uploader is created in a paused state, you **must** call this method to begin uploading.
+Start or resume the uploader and watcher. Since the uploader and watcher are created in a paused state, you **must** call this method to begin watching and uploading. Until this method is called, *no* items will be added to the queue and *no* `upload` events are fired.
 
 ```javascript
 uploader.resume();

@@ -99,7 +99,7 @@ class DesktopUploader extends EventEmitter
 
   # Start or resume uploading
   resume: ->
-    # If not already running
+    # If not already watching
     if not watcher
       self.emit 'resume'
 
@@ -122,12 +122,21 @@ class DesktopUploader extends EventEmitter
         log "Adding #{path}"
         watcher.add path
 
-  # Stop uploading
-  pause: ->
-    self.emit 'pause'
+    # If not processing items
+    if queue.paused then queue.resume()
+
+  # Stop watching for file system events
+  pauseWatcher: ->
+    self.emit 'pause', 'watcher'
 
     watcher.close()
     watcher = null
+
+  # Stop uploading
+  pause: ->
+    self.emit 'pause', 'queue'
+
+    queue.pause()
 
   # Manually save config
   save: (immediate) ->
