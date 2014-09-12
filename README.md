@@ -45,7 +45,7 @@ var uploader = new DesktopUploader({
   name: 'my-cool-app',
   paths: ['/home/daniel/Pictures'],
   concurrency: 3,
-  retry: 2
+  retries: 2
 });
 ```
 
@@ -111,10 +111,10 @@ It's possible to automatically throttle uploads, or set throttling to a specific
 
 ```javascript
 // Throttle to 100 kbytes per second
-uploader.throttle(100 * 1024);
+uploader.throttle = 100 * 1024;
 
 // Disable throttling
-uploader.throttle(false);
+uploader.throttle = false;
 ```
 
 ## Advanced Example
@@ -271,7 +271,7 @@ uploader.watch('/some/path', {my: 'config'});
 
 ### Properties
 
-#### Property: `concurrency`
+#### Property: `concurrency = 2`
 This value determines the number of concurrent uploads. If throttling is enabled, then all uploads are throttled to the aggregate bandwidth limit. Setting a concurrency limit of `1` means only one upload at a time.
 
 ```javascript
@@ -281,7 +281,7 @@ uploader.concurrency = 5;
 #### Property: `modifyInterval = 5000`
 This value determines how often in milliseconds a file is checked to see if it has been modified. If a file has not been modified between checks, then it is eligible to be uploaded and an `upload` event will be fired. Defaults to **5 seconds**.
 
-#### Property `retries`
+#### Property `retries = 0`
 This value determines the automatic retry count. Anytime the `done` function is called with an error during the `upload` event handler it is considered for a retry. The `upload` event will be emitted again up to the number of retries. Set to zero to disable retry logic.
 
 ```javascript
@@ -300,7 +300,7 @@ Name | Description                | Example
 path | The full path to the file  | `'/home/daniel/Pictures/2014/IMG_8088.jpg'`
 root | The watched directory path | `'/home/daniel/Pictures'`
 
-#### Property: `throttle`
+#### Property: `throttle = false`
 This value determines the bandwidth throttling limit in bytes per second. Setting to `null`, `false`, or no options will disable bandwidth throttling.
 
 ```javascript
@@ -353,14 +353,14 @@ console.log(paths['/some/path'].foo); // Prints out 3
 ```
 
 #### Method: `pause`
-Temporarily stop the uploader from firing `upload` events. Existing in-flight items will complete, but no new items will be processed until `resume` has been called.
+Temporarily stop the uploader from firing `upload` events. Existing in-flight items will complete, but no new items will be processed until `resume` has been called. File system events will continue to add items on to the queue.
 
 ```javascript
 uploader.pause();
 ```
 
 #### Method: `pauseWatcher`
-Temporarily ignore all file system events. No new or changed items will be added to the queue until `resume` has been called.
+Temporarily ignore all file system events. No new or changed items will be added to the queue until `resume` has been called. The `upload` event will continue to be called for existing items in the queue. See the `pause` method to prevent items already in the queue from being processed.
 
 ```javascript
 uploader.pauseWatcher();
@@ -374,7 +374,7 @@ uploader.resume();
 ```
 
 #### Method: `save`
-Give a hint that the uploader should save its configuration to disk in the near future. If `immediate` is `true`, then save to disk right now.
+Give a hint that the uploader should save its configuration to disk in the near future. If `immediate` is `true`, then save to disk right now. If `immediate` is `false`, then at most `saveInterval` milliseconds (see the constructor method) will pass before the file is saved. When your app is about to exit, you must remember to force an immediate save, otherwise data may be lost.
 
 ```javascript
 // Save in the near future, when convenient
