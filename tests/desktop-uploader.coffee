@@ -118,7 +118,7 @@ describe 'Desktop Uploader', ->
       assert.equal entries[0].path, '/tmp1/new1.txt'
       done()
 
-  it 'Should not upload changes after unwatch', (done) ->
+  it 'Should not queue or upload changes after unwatch', (done) ->
     entries.length = 0
     uploader.unwatch '/tmp2'
 
@@ -131,9 +131,36 @@ describe 'Desktop Uploader', ->
       ignoreFired = true
 
     delay 10, ->
+      assert.equal uploader.tasks.length, 0
       assert.equal entries.length, 0
       assert.ok ignoreFired
       done()
+
+  it 'Should not upload queued changes after unwatch', (done) ->
+    entries.length = 0
+    uploader.pause()
+
+    uploader.watch '/tmp2'
+    fs.writeFileSync '/tmp2/new2.txt'
+    watcher.emit 'change', '/tmp2/new2.txt'
+
+    delay 10, ->
+      assert.equal uploader.tasks.length, 1
+
+      uploader.unwatch '/tmp2'
+
+      ignoreFired = false
+      uploader.once 'ignore', (filename) ->
+        assert.equal filename, '/tmp2/new2.txt'
+        ignoreFired = true
+
+      uploader.resume()
+
+      delay 10, ->
+        assert.equal uploader.tasks.length, 0
+        assert.equal entries.length, 0
+        assert.ok ignoreFired
+        done()
 
   it 'Should ignore unchanged file', ->
     assert.ok watcher.ignored '/tmp1/file1.txt'

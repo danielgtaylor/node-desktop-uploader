@@ -72,7 +72,7 @@ DesktopUploader = (options={}) ->
       if options.throttle then self.throttle = options.throttle
       if options.extensions then extensions = options.extensions
       if options.retries then tryCount = options.retries + 1
-      
+
       self.modifyInterval = options.modifyInterval or 5000
 
       loadConfig()
@@ -198,7 +198,7 @@ DesktopUploader = (options={}) ->
         config = JSON.parse(fs.readFileSync path, 'utf-8')
         for key, value of config.cache or {}
           value.mtime = new Date(value.mtime)
-        
+
         cache = config.cache or {}
         paths = config.paths or {}
         customConfig = config.customConfig or {}
@@ -271,7 +271,7 @@ DesktopUploader = (options={}) ->
       # is called, so let's check here and not process those items
       unless paths[entry.root]
         log "Skipping #{entry.path} which is no longer watched"
-        self.emit 'ignore', filename
+        self.emit 'ignore', entry.path
         return done()
 
       entry.config = paths[entry.root]
