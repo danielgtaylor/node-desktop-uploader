@@ -66,6 +66,7 @@ DesktopUploader = (options={}) ->
     constructor: ->
       self = this
       concurrency = options.concurrency or 2
+      saveInterval = options.saveInterval or 10000
 
       if options.name then name = options.name
       if options.configPath then configPath = options.configPath
@@ -77,7 +78,7 @@ DesktopUploader = (options={}) ->
 
       loadConfig()
 
-      saveConfig = _.debounce _saveConfig, options.saveInterval or 10000
+      saveConfig = _.debounce _saveConfig, saveInterval, maxWait: saveInterval
 
       # Load paths from config
       for path, config of paths
