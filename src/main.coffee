@@ -10,6 +10,14 @@ pathJoin = require('path').join
 
 delay = (ms, func) -> setTimeout func, ms
 
+# Transforms a string depending on the case-sensitivity of the
+# operating system. E.g. on Windows and Mac this will help to ensure
+# that comparisons between 'C:\foo' and 'c:\foo' are equal.
+caseTransform = (value) ->
+  switch process.platform
+    when 'darwin', 'win32' then value.toLowerCase()
+    else value
+
 # This is a function which returns a new instance of a class. Inside of the
 # function is a closure which holds private properties of the class. The
 # private properties are unique to each instance, which is why we need the
@@ -249,8 +257,9 @@ DesktopUploader = (options={}) ->
           log err
           return self.emit 'error', err, filename
         root = null
+        casedFilename = caseTransform filename
         for path of paths
-          index = filename.indexOf path
+          index = casedFilename.indexOf caseTransform(path)
           if index isnt -1 and filename[index + path.length] in ['/', '\\']
             root = path
             break

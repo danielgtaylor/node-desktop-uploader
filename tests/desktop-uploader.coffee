@@ -118,6 +118,36 @@ describe 'Desktop Uploader', ->
       assert.equal entries[0].path, '/tmp1/new1.txt'
       done()
 
+  it 'Should handle platform case-sensitivity', (done) ->
+    entries.length = 0
+    platform = process.platform
+    process.platform = 'linux'
+
+    # MockFS is case-sensitive, so create this to simulate case-insensitivity
+    # at the filesystem layer.
+    fs.mkdirSync '/TmP1'
+    fs.writeFileSync '/TmP1/New1.txt', 'data', 'utf-8'
+
+    watcher.emit 'change', '/TmP1/New1.txt'
+
+    delay 10, ->
+      process.platform = platform
+      assert.equal entries.length, 0
+      done()
+
+  it 'Should handle platform case-insensitivity', (done) ->
+    entries.length = 0
+    platform = process.platform
+    process.platform = 'win32'
+
+    watcher.emit 'change', '/TmP1/New1.txt'
+
+    delay 10, ->
+      process.platform = platform
+      assert.equal entries.length, 1
+      assert.equal entries[0].path, '/TmP1/New1.txt'
+      done()
+
   it 'Should not queue or upload changes after unwatch', (done) ->
     entries.length = 0
     uploader.unwatch '/tmp2'
