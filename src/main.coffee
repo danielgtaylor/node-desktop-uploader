@@ -217,10 +217,11 @@ DesktopUploader = (options={}) ->
       # Is this extension ignored? Only ignore files, not directories.
       if extensions and fs.statSync(filename).isFile()
         if filename.split('.').pop().toLowerCase() not in extensions
-          log "Ignoring #{filename}"
+          log "Ignoring #{filename} because of extension"
           self.emit 'ignore', filename
           return true
 
+      # Not in the cache? Must be a new file, do not ignore!
       unless cache[filename] then return false
 
       stat = fs.statSync filename
@@ -230,7 +231,7 @@ DesktopUploader = (options={}) ->
 
       # TODO: check hash or something?
 
-      log "Ignoring #{filename}"
+      log "Ignoring #{filename}, not modified"
       self.emit 'ignore', filename
       true
 
@@ -248,7 +249,7 @@ DesktopUploader = (options={}) ->
           delay self.modifyInterval, done()
 
       checkSize = ->
-        log "Checking size of #{filename}"
+        log "Checking size of #{filename} (#{size} vs #{newSize})"
         size isnt newSize
 
       log "Waiting to finish writes: #{event} - #{filename}"
@@ -290,8 +291,6 @@ DesktopUploader = (options={}) ->
       if throttleGroup
         entry.stream = entry.stream.pipe(throttleGroup.throttle())
 
-      log "Going to upload #{entry.path}, #{entry.config}"
-
       fs.stat entry.path, (err, stat) ->
         if err
           log err
@@ -311,6 +310,8 @@ DesktopUploader = (options={}) ->
           if not self.emit 'upload', entry, tryUploadDone
             # No event handler registered, finish the entry
             tryUploadDone()
+
+        log "Going to upload #{entry.path}, #{entry.size}"
 
         async.retry tryCount, tryUpload.bind(this, entry), (err, result) ->
           self.emit 'processed', entry, not err
